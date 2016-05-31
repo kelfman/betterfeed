@@ -1,0 +1,23 @@
+@mixin transition($args...){
+  @include prefix(transition, $args);
+}
+
+@mixin translateX($args...){
+  @include prefix(transform, translateX($args));
+}
+
+@mixin translateY($args...){
+  @include prefix(transform, translateY($args));
+}
+
+@mixin translate3d($args...){
+  @include prefix(transform, translate3d($args));
+}
+
+@mixin scale($args...){
+  @include prefix(transform, scale($args));
+}
+
+@mixin rotate($args...){
+  @include prefix(transform, rotate($args));
+}

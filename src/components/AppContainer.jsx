@@ -1,12 +1,17 @@
 import React from 'react';
 
-export default React.createClass({
+class AppContainer extends React.Component {
+  constructor() {
+    super();
+  }
+
   render() {
     return (
       <div id='AppContainer'>
-        hey
         {this.props.children}
       </div>
     );
   }
-});
+}
+
+export default AppContainer;

@@ -1,0 +1,8 @@
+@mixin transition-opacity($type, $from, $to){
+  &-#{$type}{
+    opacity: $from;
+  }
+  &-#{$type}-active{
+    opacity: $to;
+  }
+}

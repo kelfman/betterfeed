@@ -1,0 +1,8 @@
+#FeedPage{
+  .noStories{
+    @extend %flexbox-center;
+    color: #fff;
+    height: 12em;
+    font-size: 1.3em;
+  }
+}

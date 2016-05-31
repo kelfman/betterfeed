@@ -1,13 +1,12 @@
 import React from 'react';
-import {Router, Route, browserHistory} from 'react-router';
-import App from './components/AppContainer.jsx';
+import {IndexRoute, Router, Route, browserHistory} from 'react-router';
+import AppContainer from './components/AppContainer.jsx';
+import FeedPage from './components/pages/FeedPage.jsx';
 
-// var PostListView = require('./components/PostListView.jsx');
-// var SinglePostView = require('./components/SinglePostView.jsx');
-
-export default {
+export default (
   <Router history={browserHistory}>
     <Route path="/" component={AppContainer}>
+      <IndexRoute component={FeedPage}/>
     </Route>
   </Router>
-};
+);

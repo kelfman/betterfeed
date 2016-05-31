@@ -1,0 +1,44 @@
+@mixin prefix($property, $args...){
+  -webkit-#{$property}: $args;
+  -moz-#{$property}: $args;
+  -ms-#{$property}: $args;
+  #{$property}: $args;
+}
+
+@mixin gradient($fromColor, $toColor, $fromPos: 0%, $toPos: 100%){
+  background: -webkit-gradient(linear, left top, left bottom, color-stop($fromPos, $fromColor), color-stop($toPos, $toColor));
+  background: -webkit-linear-gradient(top, $fromColor $fromPos, $toColor $toPos);
+  background: -moz-linear-gradient(top, $fromColor $fromPos, $toColor $toPos);
+  background: -ms-linear-gradient(top, $fromColor $fromPos, $toColor $toPos);
+  background: linear-gradient(top, $fromColor $fromPos, $toColor $toPos);
+}
+
+%ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+%scrollable{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-scroll-chaining: none;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+%scrollable-x{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-scroll-chaining: none;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+%flexbox-center{
+  @include flexbox;
+  @include align-items(center);
+  @include justify-content(center);
+}
+
+%backdrop-blur{
+  @include prefix(backdrop-filter, blur($bg-blur));
+}

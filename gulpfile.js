@@ -1,13 +1,14 @@
-import babelify from 'babelify';
-import browserify from 'browserify';
-import buffer from 'vinyl-buffer';
-import gulp from 'gulp';
-import notify from 'gulp-notify';
-import uglify from 'gulp-uglify';
-import gutil from 'gulp-util';
-import nodemon from 'nodemon';
-import package from './package.json';
-import source from 'vinyl-source-stream';
+var babelify = require('babelify');
+var browserify = require('browserify');
+var buffer = require('vinyl-buffer');
+var gulp = require('gulp');
+var notify = require('gulp-notify');
+var uglify = require('gulp-uglify');
+var gutil = require('gulp-util');
+var nodemon = require('nodemon');
+var package = require('./package.json');
+var sass = require('gulp-sass');
+var source = require('vinyl-source-stream');
 
 gulp.task('bundle', function() {
   function handleErrors() {
@@ -16,34 +17,30 @@ gulp.task('bundle', function() {
       title: 'Compile Error',
       message: '<%= error.message %>'
     }).apply(this, args);
-    this.emit('end'); // Keep gulp from hanging on this task
+    this.emit('end'); // Keep gulp = require(hanging on this task
   }
 
-  function handleUpdate() {
-    gutil.log('Rebundle...');
-  }
-
-  return browserify(package.paths.app)
-    .transform('babelify', {presets: ['es2015', 'react']})
+  browserify(package.paths.app)
+    .transform(babelify, {presets: ['es2015', 'react', 'stage-0']})
     .bundle()
-    .on('update', handleUpdate)
     .on('error', handleErrors)
-    .pipe(source(package.dest.app))
-    .pipe(buffer())
-    .pipe(uglify())
+    .pipe(source(package.dest.bundle))
+    // .pipe(buffer())
+    // .pipe(uglify())
     .pipe(gulp.dest(package.dest.dist));
+
+  gulp.src(package.paths.cssIdx)
+    .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+    .pipe(gulp.dest(package.dest.css));
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['src/**/*.js', 'src/**/*.jsx'],['bundle']);
+  gulp.watch(['src/**/*.js', 'src/**/*.jsx', 'src/**/*.scss'], ['bundle']);
 });
 
 gulp.task('nodemon', function() {
   nodemon({
-    script: 'app', ext: 'js jsx jade', ignore: ['public/scripts/react/*']
-  })
-  .on('restart', function() {
-      gutil.log('Restarted server with changes...');
+    script: 'bin/www', ext: 'js jsx jade', ignore: [package.dest.dist+'/*']
   });
 });
 

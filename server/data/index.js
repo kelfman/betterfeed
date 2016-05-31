@@ -1,5 +1,5 @@
-import request from 'superagent';
-import config from '../config';
+var request = require('superagent');
+var config = require('../../config');
 
 exports.showAllPosts = function(req,res,next){
     request.get(config.baseUrl+'/static/posts.json',function(err,response){
