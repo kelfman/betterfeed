@@ -38,7 +38,3 @@
   @include align-items(center);
   @include justify-content(center);
 }
-
-%backdrop-blur{
-  @include prefix(backdrop-filter, blur($bg-blur));
-}

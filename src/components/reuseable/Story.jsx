@@ -1,15 +1,21 @@
 import React, {PropTypes} from 'react';
 
-const Story = (props) => {
+const Story = ({user, content, isNew}) => {
   return (
     <div className='Story'>
-      Here's a Story
+      <div className='header'>
+        <Link className='user' to={'/users/'+user.email}>{user.email}</Link>
+        {isNew ? <div className='new'>new</div> : ''}
+      </div>
+      <div className='content'>{content}</div>
     </div>
   );
 };
 
 Story.propTypes = {
-  content: PropTypes.string
+  content: PropTypes.string.isRequired,
+  isNew: PropTypes.bool,
+  user: PropTypes.object.isRequired
 };
 
 export default Story;

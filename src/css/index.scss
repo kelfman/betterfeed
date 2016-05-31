@@ -11,9 +11,11 @@
 // Core
 @import 'normalize';
 @import 'base';
+@import 'forms';
 
 // Components
 @import 'components/FeedPage';
-@import 'components/Navbar';
+@import 'components/IconButton';
 @import 'components/Page';
+@import 'components/PostPage';
 @import 'components/Story';

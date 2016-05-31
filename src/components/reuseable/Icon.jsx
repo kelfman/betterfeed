@@ -32,7 +32,8 @@ const Icon = ({bgcolor, bgsize, color, name, size, style}) => {
       backgroundColor: bgcolor || 'transparent',
       width: bgsize,
       height: bgsize,
-      borderRadius: '50%'
+      borderRadius: '50%',
+      textAlign: 'center'
     };
     return <div style={bgStyles}>{svg}</div>;
   } else {

@@ -6,3 +6,12 @@
     opacity: $to;
   }
 }
+
+@mixin transition-shadow($type, $from, $to){
+  &-#{$type}{
+    box-shadow: $from;
+  }
+  &-#{$type}-active{
+    box-shadow: $to;
+  }
+}

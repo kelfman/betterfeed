@@ -1,11 +1,11 @@
 .Page{
-  &> header, &> footer{
-    @include flex(0, 1, auto);
-  }
+  max-width: 36em;
+  margin: 0 auto;
 
-  &> main{
-    @include flex(1, 1, auto);
-    max-width: 36em;
-    margin: 0 auto;
+  .backBtn{
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
   }
 }
