@@ -2,6 +2,7 @@ import React from 'react';
 import {withRouter} from 'react-router';
 import IconLink from '../reuseable/IconLink.jsx';
 import Page from '../reuseable/Page.jsx';
+import StoriesActions from '../../actions/StoriesActions.js';
 
 class PostPage extends React.Component {
   constructor(props) {

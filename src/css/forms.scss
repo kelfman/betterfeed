@@ -4,23 +4,45 @@
   margin: 0 auto;
 
   form{
+    display: block;
     width: 100%;
 
-    textarea{
-      padding: 1.5em;
+    textarea, button, .inputWrapper{
+      box-shadow: 0 1px 8px rgba(0,0,0,.5);
+    }
+
+    textarea, input{
       display: block;
       width: 100%;
       background-color: rgba(255,255,255,.95);
-      border-radius: 1em;
-      resize: none;
       outline: none;
       border: none;
+      padding: 1.5em;
+    }
+
+    textarea{
+      border-radius: 1em;
+      resize: none;
       height: 12em;
+    }
+
+    .inputWrapper{
+      border-radius: 1em;
+    }
+
+    input:first-of-type{
+      border-bottom: solid 1px #ddd;
+      border-radius: 1em 1em 0 0;
+    }
+
+    input:last-of-type{
+      border-radius: 0 0 1em 1em;
     }
 
     button{
       margin-top: 1em;
       padding: 1em;
+      height: 4.125em;
       display: block;
       width: 100%;
       border-radius: 1em;
@@ -29,6 +51,21 @@
       color: #fff;
       font-weight: bold;
       outline: none;
+    }
+
+    .formInvalid{
+      margin-top: 2em;
+      height: 2em;
+      text-align: center;
+      color: #ff0000;
+      font-weight: bold;
+    }
+
+    .or{
+      padding-top: 1em;
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
     }
   }
 }

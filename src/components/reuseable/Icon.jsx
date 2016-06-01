@@ -1,3 +1,8 @@
+/**
+ * Author: Kane Elfman
+ * Note: I really need to open source this...
+ */
+
 import assign from 'object-assign';
 import React, {PropTypes} from 'react';
 import icons from '../../maps/icons.jsx';

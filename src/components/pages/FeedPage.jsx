@@ -3,6 +3,7 @@ import colors from '../../maps/colors.js';
 import IconLink from '../reuseable/IconLink.jsx';
 import Page from '../reuseable/Page.jsx';
 import Story from '../reuseable/Story.jsx';
+import StoriesActions from '../../actions/StoriesActions.js';
 
 class FeedPage extends React.Component {
   constructor(props) {

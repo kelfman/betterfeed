@@ -3,7 +3,7 @@ import config from '../../config.js';
 import request from 'superagent';
 
 
-class StoryActions {
+class StoriesActions {
   loadAllStories() {
     request.get(config.baseUrl+'/api/stories', (err, response) => {
       this.actions.updateStories(response.body);
@@ -25,4 +25,4 @@ class StoryActions {
   }
 }
 
-module.exports = alt.createActions(PostActions);
+module.exports = alt.createActions(StoriesActions);

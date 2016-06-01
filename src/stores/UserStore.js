@@ -1,28 +1,26 @@
 import alt from '../alt.js';
 import UserActions from '../actions/UserActions.js';
 
-class PostStore {
+class UserStore {
+  constructor() {
+    this.bindListeners({
+      setCurrentUser: UserActions.SET_CURRENT_USER,
+      formInvalid: UserActions.FORM_INVALID
+    });
 
-    constructor() {
-        this.bindListeners({
-            updateCurrentPost: PostActions.UPDATE_CURRENT_POST,
-            updatePosts:  PostActions.UPDATE_POSTS
-        });
+    this.on('init', () => {
+      this.currentUser = {};
+      this.formInvalid = false;
+    });
+  }
 
-        this.on('init', () => {
-            this.posts = [];
-            this.currentPost = null;
-        });
-    }
+  setCurrentUser(user) {
+    this.currentUser = user;
+  }
 
-    updateCurrentPost(post) {
-        this.currentPost = post;
-    }
-
-    updatePosts(posts) {
-        this.posts = posts;
-    }
-
+  formInvalid(isInvalid) {
+    this.formInvalid = isInvalid;
+  }
 }
 
 module.exports = alt.createStore(UserStore, 'UserStore');
