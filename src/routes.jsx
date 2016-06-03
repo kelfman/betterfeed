@@ -4,6 +4,7 @@ import AppContainer from './components/AppContainer.jsx';
 import FeedPage from './components/pages/FeedPage.jsx';
 import LoginPage from './components/pages/LoginPage.jsx';
 import PostPage from './components/pages/PostPage.jsx';
+import ProfilePage from './components/pages/ProfilePage.jsx';
 
 export default (
   <Router history={browserHistory}>
@@ -11,6 +12,7 @@ export default (
       <Route path='' component={FeedPage}>
         <Route path='post' component={PostPage}/>
       </Route>
+      <Route path='users/:email' component={ProfilePage}/>
       <Route path='login' component={LoginPage}/>
       <IndexRoute component={FeedPage}/>
     </Route>

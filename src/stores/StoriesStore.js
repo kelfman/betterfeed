@@ -1,15 +1,17 @@
 import alt from '../alt.js';
-import StoriesActions from '../actions/StoryActions.js';
+import StoriesActions from '../actions/StoriesActions.js';
+
 
 class StoriesStore {
   constructor() {
     this.bindListeners({
-      addStory: StoryActions.ADD_STORY,
-      updateStories: StoryActions.UPDATE_STORIES
+      updateStories: StoriesActions.UPDATE_STORIES,
+      incrementPostsCount: StoriesActions.INCREMENT_POSTS_COUNT
     });
 
     this.on('init', () => {
       this.stories = [];
+      this.newPostsCnt = 0;
     });
   }
 
@@ -17,8 +19,8 @@ class StoriesStore {
     this.stories = stories;
   }
 
-  addStory(story) {
-    this.stories.push(story);
+  incrementPostsCount() {
+    this.newPostsCnt += 1;
   }
 }
 

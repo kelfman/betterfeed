@@ -1,22 +1,20 @@
 import alt from '../alt.js';
-import config from '../../config.js';
-import request from 'superagent';
+import authSrvc from '../services/auth.js';
+import usersSrvc from '../services/users.js';
 
 
 class UserActions {
   signup(email, password) {
     return (dispatch) => {
       dispatch();
-      request
-        .post(config.baseUrl + '/api/signup')
-        .type('json')
-        .send({email, password})
-        .end((err, res) => {
-          if (err || !res.ok) {
-            this.formInvalid();
-          } else {
-            this.setCurrentUser(res.body.user);
-          }
+      authSrvc
+        .signup(email, password)
+        .then(() => {
+          this.formInvalid(false);
+          this.login(email, password);
+        })
+        .catch(() => {
+          this.formInvalid(true);
         });
     };
   }
@@ -24,16 +22,14 @@ class UserActions {
   login(email, password) {
     return (dispatch) => {
       dispatch();
-      request
-        .post(config.baseUrl + '/api/login')
-        .type('json')
-        .send({email, password})
-        .end((err, res) => {
-          if (err || !res.ok) {
-            this.formInvalid();
-          } else {
-            this.setCurrentUser(res.body.user);
-          }
+      authSrvc
+        .login(email, password)
+        .then((user) => {
+          this.formInvalid(false);
+          this.setCurrentUser(user);
+        })
+        .catch(() => {
+          this.formInvalid(true);
         });
     };
   }
@@ -42,8 +38,21 @@ class UserActions {
     return user;
   }
 
-  formInvalid() {
-    return true;
+  getProfile(email) {
+    return (dispatch) => {
+      dispatch();
+      usersSrvc
+        .getProfile(email)
+        .then(this.setProfile);
+    };
+  }
+
+  setProfile(user) {
+    return user;
+  }
+
+  formInvalid(isInvalid) {
+    return isInvalid;
   }
 }
 

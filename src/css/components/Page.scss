@@ -1,6 +1,12 @@
 .Page{
   max-width: 36em;
-  margin: 0 auto;
+  margin: 0 auto 2em auto;
+
+  h1, h3{
+    color: #fff;
+    display: block;
+    text-align: center;
+  }
 
   .backBtn{
     position: fixed;

@@ -49,7 +49,7 @@ class LoginPage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.currentUser) {
+    if (!this.state.formInvalid && this.state.currentUser) {
       this.props.router.push('/');
     }
   }
@@ -67,9 +67,9 @@ class LoginPage extends React.Component {
               <input ref='email' type='text' placeholder='Email'/>
               <input ref='password' type='password' placeholder='password'/>
             </div>
-            <button onClick={this.handleSignup}>SIGN UP</button>
-            <div className='or'>OR</div>
             <button onClick={this.handleSignin}>SIGN IN</button>
+            <div className='or'>OR</div>
+            <button onClick={this.handleSignup}>SIGN UP</button>
             <div className='formInvalid'>
               {formInvalid ? 'Invalid register/login attempt.' : ''}
             </div>

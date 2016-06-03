@@ -1,14 +1,14 @@
-var LocalStrategy = require('passport-local').Strategy;
-import User from './models/user.js';
+import {Strategy as LocalStrategy} from 'passport-local';
+import User from '../models/user.js';
 
 
-module.exports = function(passport) {
+export default function(passport) {
   passport.serializeUser(function(user, done) {
-    done(null, user.id);
+    done(null, user.email);
   });
 
-  passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
+  passport.deserializeUser(function(email, done) {
+    User.findOne({email}, function(err, user) {
       done(err, user);
     });
   });
@@ -19,9 +19,6 @@ module.exports = function(passport) {
     passReqToCallback : true
   },
   function(req, email, password, done) {
-    console.log("DEBUG: Signup p2");
-    // asynchronous
-    // User.findOne wont fire unless data is sent back
     process.nextTick(function() {
       User.findOne({email}, function(err, user) {
         if (err) return done(err);
@@ -57,8 +54,23 @@ module.exports = function(passport) {
         console.log("Login error: Invalid password");
         return done(null, false);
       }
+      req.session.email = user.email;
       return done(null, user);
     });
-
   }));
+
+  passport.use('local', new LocalStrategy({
+    passReqToCallback : true
+  },
+  function(req, done) {
+    console.log("DEBUG: wdwqd", req);
+    // User.findOne({email}, function(err, user) {
+    //   if (!user) {
+    //     console.log("Login error: User not found");
+    //     return done(null, false);
+    //   }
+    //   return done(null, user);
+    // });
+  }));
+
 };

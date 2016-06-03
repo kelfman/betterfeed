@@ -6,10 +6,4 @@
   max-width: 100%;
   background-color: rgba(0,0,0,.3);
   @include flexbox;
-
-  h1, h3{
-    color: #fff;
-    display: block;
-    text-align: center;
-  }
 }

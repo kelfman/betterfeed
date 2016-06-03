@@ -1,16 +1,19 @@
 import alt from '../alt.js';
 import UserActions from '../actions/UserActions.js';
 
+
 class UserStore {
   constructor() {
     this.bindListeners({
       setCurrentUser: UserActions.SET_CURRENT_USER,
-      formInvalid: UserActions.FORM_INVALID
+      formInvalid: UserActions.FORM_INVALID,
+      setProfile: UserActions.SET_PROFILE
     });
 
     this.on('init', () => {
       this.currentUser = {};
       this.formInvalid = false;
+      this.user = {};
     });
   }
 
@@ -20,6 +23,10 @@ class UserStore {
 
   formInvalid(isInvalid) {
     this.formInvalid = isInvalid;
+  }
+
+  setProfile(user) {
+    this.user = user;
   }
 }
 

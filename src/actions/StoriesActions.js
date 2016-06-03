@@ -1,27 +1,33 @@
 import alt from '../alt.js';
-import config from '../../config.js';
-import request from 'superagent';
+import storiesSrvc from '../services/stories.js';
 
 
 class StoriesActions {
   loadAllStories() {
-    request.get(config.baseUrl+'/api/stories', (err, response) => {
-      this.actions.updateStories(response.body);
-    });
+    return (dispatch) => {
+      dispatch();
+      storiesSrvc
+        .fetchAll()
+        .then(this.updateStories);
+    };
   }
 
-  submitStory(story) {
-    request.get(config.baseUrl+'/api/stories', (err, response) => {
-      this.actions.addStory(response.body);
-    });
-  }
-
-  addStory(story) {
-
+  submitStory(user_id, content) {
+    return (dispatch) => {
+      dispatch();
+      storiesSrvc
+        .post(user_id, content)
+        .then(this.loadAllStories)
+        .then(this.incrementPostsCount);
+    };
   }
 
   updateStories(stories) {
-    this.dispatch(stories);
+    return stories;
+  }
+
+  incrementPostsCount() {
+    return true;
   }
 }
 

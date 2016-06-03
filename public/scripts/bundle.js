@@ -28442,13 +28442,9 @@ var _alt = require('../alt.js');
 
 var _alt2 = _interopRequireDefault(_alt);
 
-var _config = require('../../config.js');
+var _stories = require('../services/stories.js');
 
-var _config2 = _interopRequireDefault(_config);
-
-var _superagent = require('superagent');
-
-var _superagent2 = _interopRequireDefault(_superagent);
+var _stories2 = _interopRequireDefault(_stories);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28464,26 +28460,30 @@ var StoriesActions = function () {
     value: function loadAllStories() {
       var _this = this;
 
-      _superagent2.default.get(_config2.default.baseUrl + '/api/stories', function (err, response) {
-        _this.actions.updateStories(response.body);
-      });
+      return function (dispatch) {
+        dispatch();
+        _stories2.default.fetchAll().then(_this.updateStories);
+      };
     }
   }, {
     key: 'submitStory',
-    value: function submitStory(story) {
+    value: function submitStory(user_id, content) {
       var _this2 = this;
 
-      _superagent2.default.get(_config2.default.baseUrl + '/api/stories', function (err, response) {
-        _this2.actions.addStory(response.body);
-      });
+      return function (dispatch) {
+        dispatch();
+        _stories2.default.post(user_id, content).then(_this2.loadAllStories).then(_this2.incrementPostsCount);
+      };
     }
-  }, {
-    key: 'addStory',
-    value: function addStory(story) {}
   }, {
     key: 'updateStories',
     value: function updateStories(stories) {
-      this.dispatch(stories);
+      return stories;
+    }
+  }, {
+    key: 'incrementPostsCount',
+    value: function incrementPostsCount() {
+      return true;
     }
   }]);
 
@@ -28492,7 +28492,7 @@ var StoriesActions = function () {
 
 module.exports = _alt2.default.createActions(StoriesActions);
 
-},{"../../config.js":1,"../alt.js":253,"superagent":245}],252:[function(require,module,exports){
+},{"../alt.js":253,"../services/stories.js":268}],252:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -28501,13 +28501,13 @@ var _alt = require('../alt.js');
 
 var _alt2 = _interopRequireDefault(_alt);
 
-var _config = require('../../config.js');
+var _auth = require('../services/auth.js');
 
-var _config2 = _interopRequireDefault(_config);
+var _auth2 = _interopRequireDefault(_auth);
 
-var _superagent = require('superagent');
+var _users = require('../services/users.js');
 
-var _superagent2 = _interopRequireDefault(_superagent);
+var _users2 = _interopRequireDefault(_users);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28525,12 +28525,11 @@ var UserActions = function () {
 
       return function (dispatch) {
         dispatch();
-        _superagent2.default.post(_config2.default.baseUrl + '/api/signup').type('json').send({ email: email, password: password }).end(function (err, res) {
-          if (err || !res.ok) {
-            _this.formInvalid();
-          } else {
-            _this.setCurrentUser(res.body.user);
-          }
+        _auth2.default.signup(email, password).then(function () {
+          _this.formInvalid(false);
+          _this.login(email, password);
+        }).catch(function () {
+          _this.formInvalid(true);
         });
       };
     }
@@ -28541,12 +28540,11 @@ var UserActions = function () {
 
       return function (dispatch) {
         dispatch();
-        _superagent2.default.post(_config2.default.baseUrl + '/api/login').type('json').send({ email: email, password: password }).end(function (err, res) {
-          if (err || !res.ok) {
-            _this2.formInvalid();
-          } else {
-            _this2.setCurrentUser(res.body.user);
-          }
+        _auth2.default.login(email, password).then(function (user) {
+          _this2.formInvalid(false);
+          _this2.setCurrentUser(user);
+        }).catch(function () {
+          _this2.formInvalid(true);
         });
       };
     }
@@ -28556,9 +28554,24 @@ var UserActions = function () {
       return user;
     }
   }, {
+    key: 'getProfile',
+    value: function getProfile(email) {
+      var _this3 = this;
+
+      return function (dispatch) {
+        dispatch();
+        _users2.default.getProfile(email).then(_this3.setProfile);
+      };
+    }
+  }, {
+    key: 'setProfile',
+    value: function setProfile(user) {
+      return user;
+    }
+  }, {
     key: 'formInvalid',
-    value: function formInvalid() {
-      return true;
+    value: function formInvalid(isInvalid) {
+      return isInvalid;
     }
   }]);
 
@@ -28567,7 +28580,7 @@ var UserActions = function () {
 
 module.exports = _alt2.default.createActions(UserActions);
 
-},{"../../config.js":1,"../alt.js":253,"superagent":245}],253:[function(require,module,exports){
+},{"../alt.js":253,"../services/auth.js":267,"../services/users.js":269}],253:[function(require,module,exports){
 'use strict';
 
 var _alt = require('alt');
@@ -28609,7 +28622,7 @@ window.onload = function () {
   });
 };
 
-},{"./alt.js":253,"./routes.jsx":265,"iso":37,"react":242,"react-dom":41}],255:[function(require,module,exports){
+},{"./alt.js":253,"./routes.jsx":266,"iso":37,"react":242,"react-dom":41}],255:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -28662,6 +28675,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
@@ -28688,6 +28703,10 @@ var _StoriesActions = require('../../actions/StoriesActions.js');
 
 var _StoriesActions2 = _interopRequireDefault(_StoriesActions);
 
+var _StoriesStore = require('../../stores/StoriesStore.js');
+
+var _StoriesStore2 = _interopRequireDefault(_StoriesStore);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28702,15 +28721,41 @@ var FeedPage = function (_React$Component) {
   function FeedPage(props) {
     _classCallCheck(this, FeedPage);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(FeedPage).call(this, props));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(FeedPage).call(this, props));
+
+    _this.state = _StoriesStore2.default.getState();
+
+    _this._onChange = function (state) {
+      _this.setState(state);
+    };
+    return _this;
   }
 
   _createClass(FeedPage, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      _StoriesStore2.default.listen(this._onChange);
+
+      // Wait for listener to start
+      // Need this if got here from within spa
+      setTimeout(function () {
+        if (!_this2.state.stories.length) {
+          _StoriesActions2.default.loadAllStories();
+        }
+      });
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      _StoriesStore2.default.unlisten(this._onChange);
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _props = this.props;
-      var children = _props.children;
-      var stories = _props.stories;
+      var children = this.props.children;
+      var stories = this.state.stories;
 
 
       return _react2.default.createElement(
@@ -28720,8 +28765,15 @@ var FeedPage = function (_React$Component) {
         _react2.default.createElement(
           _Page2.default,
           { id: 'FeedPage' },
-          stories ? stories.map(function (story) {
-            return _react2.default.createElement(_Story2.default, story);
+          _react2.default.createElement(
+            'h1',
+            null,
+            'Welcome to BetterFeed!'
+          ),
+          stories.length ? stories.map(function (story, idx) {
+            if (story.user) {
+              return _react2.default.createElement(_Story2.default, _extends({ key: idx }, story));
+            }
           }) : _react2.default.createElement(
             'div',
             { className: 'noStories' },
@@ -28738,7 +28790,7 @@ var FeedPage = function (_React$Component) {
 
 exports.default = FeedPage;
 
-},{"../../actions/StoriesActions.js":251,"../../maps/colors.js":263,"../reuseable/IconLink.jsx":260,"../reuseable/Page.jsx":261,"../reuseable/Story.jsx":262,"react":242}],257:[function(require,module,exports){
+},{"../../actions/StoriesActions.js":251,"../../maps/colors.js":264,"../../stores/StoriesStore.js":270,"../reuseable/IconLink.jsx":261,"../reuseable/Page.jsx":262,"../reuseable/Story.jsx":263,"react":242}],257:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -28842,7 +28894,7 @@ var LoginPage = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      if (this.state.currentUser) {
+      if (!this.state.formInvalid && this.state.currentUser) {
         this.props.router.push('/');
       }
     }
@@ -28882,8 +28934,8 @@ var LoginPage = function (_React$Component) {
             ),
             _react2.default.createElement(
               'button',
-              { onClick: this.handleSignup },
-              'SIGN UP'
+              { onClick: this.handleSignin },
+              'SIGN IN'
             ),
             _react2.default.createElement(
               'div',
@@ -28892,8 +28944,8 @@ var LoginPage = function (_React$Component) {
             ),
             _react2.default.createElement(
               'button',
-              { onClick: this.handleSignin },
-              'SIGN IN'
+              { onClick: this.handleSignup },
+              'SIGN UP'
             ),
             _react2.default.createElement(
               'div',
@@ -28911,7 +28963,7 @@ var LoginPage = function (_React$Component) {
 
 exports.default = (0, _reactRouter.withRouter)(LoginPage);
 
-},{"../../actions/UserActions.js":252,"../../stores/UserStore.js":266,"../reuseable/Page.jsx":261,"object-assign":38,"react":242,"react-dom":41,"react-router":71}],258:[function(require,module,exports){
+},{"../../actions/UserActions.js":252,"../../stores/UserStore.js":271,"../reuseable/Page.jsx":262,"object-assign":38,"react":242,"react-dom":41,"react-router":71}],258:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -28923,6 +28975,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
 
 var _reactRouter = require('react-router');
 
@@ -28937,6 +28991,14 @@ var _Page2 = _interopRequireDefault(_Page);
 var _StoriesActions = require('../../actions/StoriesActions.js');
 
 var _StoriesActions2 = _interopRequireDefault(_StoriesActions);
+
+var _StoriesStore = require('../../stores/StoriesStore.js');
+
+var _StoriesStore2 = _interopRequireDefault(_StoriesStore);
+
+var _UserStore = require('../../stores/UserStore.js');
+
+var _UserStore2 = _interopRequireDefault(_UserStore);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28954,22 +29016,18 @@ var PostPage = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PostPage).call(this, props));
 
-    _this.state = {
-      text: '',
-      submitComplete: false
-    };
+    _this.state = _StoriesStore2.default.getState();
 
-    _this.handleChange = function (event) {
-      _this.setState({ text: event.target.value });
+    _this._onChange = function (state) {
+      _this.setState(state);
     };
 
     _this.handleSubmit = function (event) {
       event.preventDefault();
-      var text = _this.state.text;
-
+      var text = (0, _reactDom.findDOMNode)(_this.refs.textarea).value;
       text = text.trim();
       if (text.length) {
-        _this.setState({ submitComplete: true });
+        _StoriesActions2.default.submitStory(_UserStore2.default.state.currentUser._id, text);
       }
     };
     return _this;
@@ -28978,17 +29036,23 @@ var PostPage = function (_React$Component) {
   _createClass(PostPage, [{
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      if (this.state.submitComplete) {
-        this.setState({ text: '', submitComplete: false });
+      if (this.state.newPostsCnt > prevState.newPostsCnt) {
         this.props.router.push('/');
       }
     }
   }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      _StoriesStore2.default.listen(this._onChange);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      _StoriesStore2.default.unlisten(this._onChange);
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var text = this.state.text;
-
-
       return _react2.default.createElement(
         _Page2.default,
         { id: 'PostPage' },
@@ -29000,9 +29064,8 @@ var PostPage = function (_React$Component) {
             'form',
             { onSubmit: this.handleSubmit },
             _react2.default.createElement('textarea', {
+              ref: 'textarea',
               placeholder: 'What do you want to say?',
-              onChange: this.handleChange,
-              value: text,
               maxLength: 200
             }),
             _react2.default.createElement(
@@ -29021,7 +29084,115 @@ var PostPage = function (_React$Component) {
 
 exports.default = (0, _reactRouter.withRouter)(PostPage);
 
-},{"../../actions/StoriesActions.js":251,"../reuseable/IconLink.jsx":260,"../reuseable/Page.jsx":261,"react":242,"react-router":71}],259:[function(require,module,exports){
+},{"../../actions/StoriesActions.js":251,"../../stores/StoriesStore.js":270,"../../stores/UserStore.js":271,"../reuseable/IconLink.jsx":261,"../reuseable/Page.jsx":262,"react":242,"react-dom":41,"react-router":71}],259:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _Page = require('../reuseable/Page.jsx');
+
+var _Page2 = _interopRequireDefault(_Page);
+
+var _UserActions = require('../../actions/UserActions.js');
+
+var _UserActions2 = _interopRequireDefault(_UserActions);
+
+var _UserStore = require('../../stores/UserStore.js');
+
+var _UserStore2 = _interopRequireDefault(_UserStore);
+
+var _IconLink = require('../reuseable/IconLink.jsx');
+
+var _IconLink2 = _interopRequireDefault(_IconLink);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ProfilePage = function (_React$Component) {
+  _inherits(ProfilePage, _React$Component);
+
+  function ProfilePage(props) {
+    _classCallCheck(this, ProfilePage);
+
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ProfilePage).call(this, props));
+
+    _this.state = _UserStore2.default.getState();
+
+    _this._onChange = function (state) {
+      _this.setState(state);
+    };
+    return _this;
+  }
+
+  _createClass(ProfilePage, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      _UserStore2.default.listen(this._onChange);
+
+      // Wait for listener to start
+      // Need this if got here from within spa
+      setTimeout(function () {
+        if (!_this2.state.user) {
+          _UserActions2.default.getProfile(_this2.props.params.email);
+        }
+      });
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      _UserStore2.default.unlisten(this._onChange);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var user = this.state.user;
+
+
+      return _react2.default.createElement(
+        _Page2.default,
+        { id: 'ProfilePage' },
+        _react2.default.createElement(_IconLink2.default, { className: 'backBtn', to: '/', name: 'back', size: 24, bgsize: 48 }),
+        user ? _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            'h3',
+            null,
+            user.email
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'blurb' },
+            user.blurb || 'A short bio...'
+          )
+        ) : null
+      );
+    }
+  }]);
+
+  return ProfilePage;
+}(_react2.default.Component);
+
+exports.default = ProfilePage;
+
+},{"../../actions/UserActions.js":252,"../../stores/UserStore.js":271,"../reuseable/IconLink.jsx":261,"../reuseable/Page.jsx":262,"react":242,"react-dom":41}],260:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -29115,7 +29286,7 @@ Icon.defaultProps = {
 
 exports.default = Icon;
 
-},{"../../maps/icons.jsx":264,"object-assign":38,"react":242}],260:[function(require,module,exports){
+},{"../../maps/icons.jsx":265,"object-assign":38,"react":242}],261:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -29160,7 +29331,7 @@ IconLink.propTypes = {
 
 exports.default = IconLink;
 
-},{"./Icon.jsx":259,"classnames":10,"react":242,"react-router":71}],261:[function(require,module,exports){
+},{"./Icon.jsx":260,"classnames":10,"react":242,"react-router":71}],262:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -29220,7 +29391,7 @@ Page.propTypes = {
 
 exports.default = Page;
 
-},{"classnames":10,"react":242}],262:[function(require,module,exports){
+},{"classnames":10,"react":242}],263:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -29230,6 +29401,8 @@ Object.defineProperty(exports, "__esModule", {
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = require('react-router');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -29245,7 +29418,7 @@ var Story = function Story(_ref) {
       'div',
       { className: 'header' },
       _react2.default.createElement(
-        Link,
+        _reactRouter.Link,
         { className: 'user', to: '/users/' + user.email },
         user.email
       ),
@@ -29271,7 +29444,7 @@ Story.propTypes = {
 
 exports.default = Story;
 
-},{"react":242}],263:[function(require,module,exports){
+},{"react":242,"react-router":71}],264:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -29283,7 +29456,7 @@ var colors = {
 
 exports.default = colors;
 
-},{}],264:[function(require,module,exports){
+},{}],265:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29303,7 +29476,7 @@ var icons = {
 
 exports.default = icons;
 
-},{"react":242}],265:[function(require,module,exports){
+},{"react":242}],266:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -29332,6 +29505,10 @@ var _PostPage = require('./components/pages/PostPage.jsx');
 
 var _PostPage2 = _interopRequireDefault(_PostPage);
 
+var _ProfilePage = require('./components/pages/ProfilePage.jsx');
+
+var _ProfilePage2 = _interopRequireDefault(_ProfilePage);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = _react2.default.createElement(
@@ -29345,12 +29522,187 @@ exports.default = _react2.default.createElement(
       { path: '', component: _FeedPage2.default },
       _react2.default.createElement(_reactRouter.Route, { path: 'post', component: _PostPage2.default })
     ),
+    _react2.default.createElement(_reactRouter.Route, { path: 'users/:email', component: _ProfilePage2.default }),
     _react2.default.createElement(_reactRouter.Route, { path: 'login', component: _LoginPage2.default }),
     _react2.default.createElement(_reactRouter.IndexRoute, { component: _FeedPage2.default })
   )
 );
 
-},{"./components/AppContainer.jsx":255,"./components/pages/FeedPage.jsx":256,"./components/pages/LoginPage.jsx":257,"./components/pages/PostPage.jsx":258,"react":242,"react-router":71}],266:[function(require,module,exports){
+},{"./components/AppContainer.jsx":255,"./components/pages/FeedPage.jsx":256,"./components/pages/LoginPage.jsx":257,"./components/pages/PostPage.jsx":258,"./components/pages/ProfilePage.jsx":259,"react":242,"react-router":71}],267:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _superagent = require('superagent');
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
+var _config = require('../../config.js');
+
+var _config2 = _interopRequireDefault(_config);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+
+  signup: function signup(email, password) {
+    return new Promise(function (resolve, reject) {
+      _superagent2.default.post(_config2.default.baseUrl + '/api/signup').type('json').send({ email: email, password: password }).end(function (err, res) {
+        if (err || !res.body || !res.body.user) {
+          reject();
+        } else {
+          resolve(res.body.user);
+        }
+      });
+    });
+  },
+
+  login: function login(email, password) {
+    return new Promise(function (resolve, reject) {
+      _superagent2.default.post(_config2.default.baseUrl + '/api/login').type('json').send({ email: email, password: password }).end(function (err, res) {
+        if (err || !res.body && !res.body.user) {
+          reject();
+        } else {
+          resolve(res.body.user);
+        }
+      });
+    });
+  }
+
+};
+
+},{"../../config.js":1,"superagent":245}],268:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _superagent = require('superagent');
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
+var _config = require('../../config.js');
+
+var _config2 = _interopRequireDefault(_config);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+
+  post: function post(user_id, content) {
+    return new Promise(function (resolve, reject) {
+      _superagent2.default.post(_config2.default.baseUrl + '/api/stories').type('json').send({ user_id: user_id, content: content }).end(function (err, res) {
+        if (err || !res.ok) {
+          reject();
+        } else {
+          resolve();
+        }
+      });
+    });
+  },
+
+  fetchAll: function fetchAll() {
+    return new Promise(function (resolve, reject) {
+      _superagent2.default.get(_config2.default.baseUrl + '/api/stories').type('json').send().end(function (err, res) {
+        if (err || !res.body) {
+          reject();
+        } else {
+          resolve(res.body.stories);
+        }
+      });
+    });
+  }
+
+};
+
+},{"../../config.js":1,"superagent":245}],269:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _superagent = require('superagent');
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
+var _config = require('../../config.js');
+
+var _config2 = _interopRequireDefault(_config);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+
+  getProfile: function getProfile(email) {
+    return new Promise(function (resolve, reject) {
+      _superagent2.default.get(_config2.default.baseUrl + '/api/users/' + email).type('json').send().end(function (err, res) {
+        if (err || !res.body || !res.body.user) {
+          reject();
+        } else {
+          resolve(res.body.user);
+        }
+      });
+    });
+  }
+
+};
+
+},{"../../config.js":1,"superagent":245}],270:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _alt = require('../alt.js');
+
+var _alt2 = _interopRequireDefault(_alt);
+
+var _StoriesActions = require('../actions/StoriesActions.js');
+
+var _StoriesActions2 = _interopRequireDefault(_StoriesActions);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var StoriesStore = function () {
+  function StoriesStore() {
+    var _this = this;
+
+    _classCallCheck(this, StoriesStore);
+
+    this.bindListeners({
+      updateStories: _StoriesActions2.default.UPDATE_STORIES,
+      incrementPostsCount: _StoriesActions2.default.INCREMENT_POSTS_COUNT
+    });
+
+    this.on('init', function () {
+      _this.stories = [];
+      _this.newPostsCnt = 0;
+    });
+  }
+
+  _createClass(StoriesStore, [{
+    key: 'updateStories',
+    value: function updateStories(stories) {
+      this.stories = stories;
+    }
+  }, {
+    key: 'incrementPostsCount',
+    value: function incrementPostsCount() {
+      this.newPostsCnt += 1;
+    }
+  }]);
+
+  return StoriesStore;
+}();
+
+module.exports = _alt2.default.createStore(StoriesStore, 'StoriesStore');
+
+},{"../actions/StoriesActions.js":251,"../alt.js":253}],271:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29375,12 +29727,14 @@ var UserStore = function () {
 
     this.bindListeners({
       setCurrentUser: _UserActions2.default.SET_CURRENT_USER,
-      formInvalid: _UserActions2.default.FORM_INVALID
+      formInvalid: _UserActions2.default.FORM_INVALID,
+      setProfile: _UserActions2.default.SET_PROFILE
     });
 
     this.on('init', function () {
       _this.currentUser = {};
       _this.formInvalid = false;
+      _this.user = {};
     });
   }
 
@@ -29393,6 +29747,11 @@ var UserStore = function () {
     key: 'formInvalid',
     value: function formInvalid(isInvalid) {
       this.formInvalid = isInvalid;
+    }
+  }, {
+    key: 'setProfile',
+    value: function setProfile(user) {
+      this.user = user;
     }
   }]);
 
