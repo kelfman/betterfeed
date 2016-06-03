@@ -29038,6 +29038,7 @@ var PostPage = function (_React$Component) {
     value: function componentDidUpdate(prevProps, prevState) {
       if (this.state.newPostsCnt > prevState.newPostsCnt) {
         this.props.router.push('/');
+        window.scrollTo(0, 0);
       }
     }
   }, {
